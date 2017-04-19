@@ -37,7 +37,7 @@ namespace Timor_Maris
             this.Faction = Faction;
             this.Health = Health;
         }
-        public override void Handle()
+        public override void Handle(GameTime GameTime)
         {
             if (ControlledByPlayer == true)
             {
@@ -48,11 +48,11 @@ namespace Timor_Maris
                 //TO DO: Change velocity to a float and remove the left and right velocity.
                 if (state.IsKeyDown(Keys.A) == true || state.IsKeyDown(Keys.Left) == true)
                 {
-                    Direction -= 5;
+                    RotationAcceleration -= 0.001f;
                 }
                 if (state.IsKeyDown(Keys.D) == true || state.IsKeyDown(Keys.Left) == true)
                 {
-                    Direction += 5;
+                    RotationAcceleration += 0.001f;
                 }
                 if (state.IsKeyDown(Keys.W) == true || state.IsKeyDown(Keys.Up) == true)
                 {
@@ -61,6 +61,10 @@ namespace Timor_Maris
                 if (state.IsKeyDown(Keys.S) == true || state.IsKeyDown(Keys.Down) == true)
                 {
                     Acceleration += 1;
+                }
+                if (state.IsKeyDown(Keys.U) == true)
+                {
+                    this.Health = 0;
                 }
             }
             else if (ControlledByAI == true)
@@ -89,6 +93,14 @@ namespace Timor_Maris
         public void setAsAI(bool ControlledByAI)
         {
             this.ControlledByAI = ControlledByAI;
+        }
+        public float getSpeed()
+        {
+            return Math.Abs(Acceleration);
+        }
+        public float getRotaSpeed()
+        {
+            return RotationAcceleration;
         }
     }
 

@@ -13,7 +13,7 @@ namespace Timor_Maris
         [STAThread]
         static void Main()
         {
-            using (var game = new Game1())
+            using (var game = new GameTimor())
                 game.Run();
         }
     }

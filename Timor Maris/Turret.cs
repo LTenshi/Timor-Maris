@@ -6,28 +6,45 @@ using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Audio;
 
 namespace Timor_Maris
 {
     class Turret : GameObject
     {
         GameObject AttachedTo;
+
+        private Vector2 FiringLocation = Vector2.Zero;
+        private float firerate;                         //THIS NEEDS TO BE IN SECONDS FOR EASE OF USE
+        private float timer;
+
+        private SoundEffect FireSound;
+        private SoundEffect ImpactSound;
+
+        private Vector2 AimLoc;
+        private List<Projectile> ProjectileList = new List<Projectile>();
+
+        private int ShotsFiredCounter;
+
+        //Flags:
         private bool ControlledByPlayer = false;
         private bool ControlledByAI = false;
+        private bool OnCooldown = false;
 
-        private Vector2 FiringLocation;
-        Projectile thisProjectile;
-        private List<Projectile> ProjectileList = new List<Projectile>();
         Turret() { }
-        public Turret(int ID, Texture2D Texture, int Faction, float Health, Ship AttachedTo)
+        public Turret(int ID, Texture2D Texture,  float Health, Ship AttachedTo, float firerate, SoundEffect FireSound, SoundEffect Impact)
         {
             this.ID = ID;
             this.Texture = Texture;
-            this.Faction = Faction;
+            this.Faction = AttachedTo.getFaction();
             this.Health = Health;
             this.AttachedTo = AttachedTo;
-            this.FiringLocation = new Vector2(this.Position.X  , this.Position.Y);
+            this.FiringLocation = Vector2.Zero;
             this.ControlledByPlayer = AttachedTo.isAI();
+            this.firerate = firerate;
+            this.timer = firerate;
+            this.FireSound = FireSound;
+            this.ImpactSound = Impact;
         }
 
         public void SetControlByPlayer(bool value)
@@ -46,47 +63,94 @@ namespace Timor_Maris
 
         }
 
-        public void Update(GameTime GameTime, Texture2D ProjectileSkin, int ProjectileDamage)
+        public void Update(GameTime GameTime, Texture2D ProjectileSkin, int ProjectileDamage, GameObject otherObject)
         {
+            
+
+
+            if (AttachedTo.getAlive() == false)
+            {
+                this.Health = 0;
+            }
+
             if (ControlledByPlayer == true)
             {
                 KeyboardState state = Keyboard.GetState();
-                MouseState mState = Mouse.GetState();
+                
+                
+                //Vector2 mLoc = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
+                Vector2 val = Position - AimLoc;
 
-                Vector2 mLoc = new Vector2(mState.X, mState.Y);
-                Vector2 val = Position - mLoc;
-                this.Rotation = (float)(Math.Atan2(val.Y, val.X));
+                float MousePositionRotation = (float)(Math.Atan2(val.Y, val.X));
 
-                //TO DO: Rebindable Controlls
-                //TO DO: Change velocity to a float and remove the left and right velocity.
-                if (state.IsKeyDown(Keys.Space) == true)
+
+                if (MousePositionRotation < Rotation) { MousePositionRotation += MathHelper.TwoPi; }
+                if ((MousePositionRotation - Rotation) < MathHelper.Pi)
                 {
-                    ProjectileList.Add(new Projectile(1, ProjectileSkin, FiringLocation, 20, 10, this));
+                    Rotation += MathHelper.ToRadians(15) * (float)GameTime.ElapsedGameTime.TotalSeconds;
                 }
+                else
+                {
+                    Rotation -= MathHelper.ToRadians(15) * (float)GameTime.ElapsedGameTime.TotalSeconds;
+                }
+
+                timer += (float)GameTime.ElapsedGameTime.TotalSeconds;
+                if (timer > firerate)
+                {
+                    OnCooldown = false;
+                }
+                if (state.IsKeyDown(Keys.Space) == true && timer > firerate)
+                {
+                    OnCooldown = true;
+                    this.FiringLocation.X = Position.X - (Texture.Height / 2) * (float)Math.Cos(Rotation);
+                    this.FiringLocation.Y = Position.Y - (Texture.Height / 2) * (float)Math.Sin(Rotation);
+
+                    ProjectileList.Add(new Projectile(1, ProjectileSkin, this.FiringLocation, ProjectileDamage, 1000, this.Rotation - MathHelper.ToRadians(180), this.Faction, ImpactSound));
+                        
+                    ShotsFiredCounter++;
+                    FireSound.Play();
+
+                    timer = 0;
+                        
+                }
+
+                //STRETCH TO DO: Rebindable Controlls
 
             }
             else if (ControlledByAI == true)
             {
-
+                this.FiringLocation = new Vector2(Position.X, Position.Y - Texture.Height);
             }
             //this.Rotation -= AttachedTo.getRotation() + 90;
+
             foreach (Projectile Projectile in ProjectileList)
             {
+
+                Projectile.CheckCollision(otherObject);
+
                 Projectile.Update(GameTime);
+                
             }
-        }
-        public void setProjectile(Projectile Projectile)
-        {
-            this.thisProjectile = Projectile;
+
         }
 
-        public override void Render(SpriteBatch spriteBatch)
+        public void setAimLoc(Vector2 value)
         {
-            base.Render(spriteBatch);
-            foreach (Projectile Projectile in ProjectileList)
-            {
-                Projectile.Render(spriteBatch);
-            }
+            AimLoc = value;
+        }
+
+        public override void Render(SpriteBatch spriteBatch, float ANGLE_OFFSET, Color Colour)
+        {
+            base.Render(spriteBatch, ANGLE_OFFSET, Colour);
+           foreach (Projectile Projectile in ProjectileList)
+           {
+              Projectile.Render(spriteBatch, -90, Colour);
+           }
+
+        }
+        public int getShotsFired()
+        {
+            return ShotsFiredCounter;
         }
     }
 }

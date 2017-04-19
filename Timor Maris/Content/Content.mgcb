@@ -49,3 +49,22 @@
 /processorParam:TextureFormat=Color
 /build:testItems/testShip.png
 
+#begin testItems/testsound.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:testItems/testsound.mp3
+
+#begin Fonts/FranklinGothic.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:Fonts/FranklinGothic.spritefont
+
+#begin testItems/testexplosion.mp3
+/importer:Mp3Importer
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:testItems/testexplosion.mp3
+

@@ -17,16 +17,17 @@ namespace Timor_Maris
         protected int Faction = 0;
         protected bool Alive = true;
         protected bool Collidable = true;
-        protected bool DebugSelected = false;             //This will be used for adding hardpoints. BUT: XML File and how to handle them
+        protected bool DebugSelected = false;             //This will be used for adding hardpoints. BUT: XML File and how to handle them. (NOTE FROM FUTURE: Might not be feasible time wise)
 
         protected Vector2 Position = new Vector2(0, 0);
-        protected Vector2 Bounds = new Vector2(0, 0);
+        protected Vector2 Bounds;
 
         protected float Health = 0f;
         protected float Acceleration = 0f;
-        protected float Direction = 0f;
+        protected float RotationAcceleration = 0f;
         protected float Rotation = 0f;
 
+        //Animation Vars
         protected int fMax = 0;
         protected int fCur = 0;
         protected int fCnt = 0;
@@ -42,13 +43,13 @@ namespace Timor_Maris
 
         //Constructors
         public GameObject() { }
-        public GameObject(int ID, Texture2D Texture, Vector2 Position, float Acceleration, float Direction)
+        public GameObject(int ID, Texture2D Texture, Vector2 Position, float Acceleration, float Rotation)
         {
             this.ID = ID;
             this.Texture = Texture;
             this.Position = Position;
             this.Acceleration = Acceleration;
-            this.Direction = Direction;
+      
         }
 
         public GameObject(int ID, Texture2D Texture, Vector2 Position, int Faction, float Health)
@@ -62,15 +63,24 @@ namespace Timor_Maris
 
         virtual public void Update(GameTime GameTime)
         {
-
-            this.Rotation = (Direction * (3.1416f / 180f)) * (float)GameTime.ElapsedGameTime.TotalSeconds;
+            Rotation += (RotationAcceleration * (float)GameTime.ElapsedGameTime.TotalSeconds);
             Position.X += (Acceleration * (float)Math.Cos(Rotation)) * (float)GameTime.ElapsedGameTime.TotalSeconds;
             Position.Y += (Acceleration * (float)Math.Sin(Rotation)) * (float)GameTime.ElapsedGameTime.TotalSeconds;
+            if (Health <= 0)
+            {
+                Alive = false;
+            }
         }
 
-        virtual public void Render(SpriteBatch spriteBatch)
+        virtual public void Render(SpriteBatch spriteBatch, float ANGLE_OFFSET, Color Colour)
         {
-            spriteBatch.Draw(texture: this.Texture, position: this.Position, origin: this.GetCentre(this.Texture), rotation: this.Rotation - (MathHelper.ToRadians(90)));
+            ANGLE_OFFSET = MathHelper.ToRadians(ANGLE_OFFSET);
+            if (this.Health > 0)
+            {
+                spriteBatch.Draw(texture: this.Texture, position: this.Position, origin: this.GetCentre(this.Texture), rotation: this.Rotation - ANGLE_OFFSET, color: Colour);
+            }
+            
+            
         }
 
         /// <summary>
@@ -80,19 +90,23 @@ namespace Timor_Maris
         /// <returns></returns>
         public bool CheckBasicCollision(GameObject OtherGameObject)
         {
-            Vector2 otherPosition = OtherGameObject.getPosition();
-            Vector2 otherBounds = OtherGameObject.getBounds();
-
-            if (Position.X + Bounds.X > otherPosition.X - otherBounds.X &&
-                 Position.X - Bounds.X < otherPosition.X + otherBounds.X &&
-                 Position.Y + Bounds.Y > otherPosition.Y - otherBounds.Y &&
-                 Position.Y - Bounds.Y < otherPosition.Y + otherBounds.Y)
+            if (OtherGameObject.getAlive() == true)
+            {
+                if (Position.X + Texture.Width < OtherGameObject.Position.X)
+                    return false;
+                if (OtherGameObject.Position.X + OtherGameObject.Texture.Width < Position.X)
+                    return false;
+                if (Position.Y + Texture.Height < OtherGameObject.Position.Y)
+                    return false;
+                if (OtherGameObject.Position.Y + OtherGameObject.Texture.Height < Position.Y)
+                    return false;
                 return true;
-            else
-                return false;
+            }
+            return false;
+
         }
 
-        virtual public void Handle()
+        virtual public void Handle(GameTime GameTime)
         {
 
         }
@@ -166,6 +180,14 @@ namespace Timor_Maris
         public void setRotation(float Rotation)
         {
             this.Rotation = Rotation;
+        }
+        public float getHealth()
+        {
+            return Health;
+        }
+        public void setHealth(float Health)
+        {
+            this.Health = Health;
         }
     }
 }
