@@ -9,15 +9,14 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Timor_Maris
 {
-    class Projectile : GameObject
+    public class Projectile : GameObject
     {
         int Damage = 0;
         SoundEffect Impact;
-        SoundEffect Flight;
-
+        
         Projectile() { }
 
-        public Projectile(int ID, Texture2D Texture, Vector2 Position, int Damage, float Acceleration, float Rotation, int Faction, SoundEffect Impact)
+        public Projectile(int ID, Texture2D Texture, Vector2 Position, int Damage, float Acceleration, float Rotation, int Faction, int health, SoundEffect Impact)
         {
             this.ID = ID;
             this.Texture = Texture;
@@ -27,7 +26,7 @@ namespace Timor_Maris
             this.Rotation = Rotation;
             this.Faction = Faction;
             this.Impact = Impact;
-            this.Health = 999;
+            this.Health = health;
             
         }
 
@@ -42,5 +41,7 @@ namespace Timor_Maris
             }
             return true;
         }
+        
+        
     }
 }

@@ -10,9 +10,11 @@ using Microsoft.Xna.Framework.Audio;
 
 namespace Timor_Maris
 {
-    class Turret : GameObject
+    public class Turret : GameObject
     {
         GameObject AttachedTo;
+
+        private float MousePositionRotation;
 
         private Vector2 FiringLocation = Vector2.Zero;
         private float firerate;                         //THIS NEEDS TO BE IN SECONDS FOR EASE OF USE
@@ -81,19 +83,28 @@ namespace Timor_Maris
                 //Vector2 mLoc = new Vector2(Mouse.GetState().X, Mouse.GetState().Y);
                 Vector2 val = Position - AimLoc;
 
-                float MousePositionRotation = (float)(Math.Atan2(val.Y, val.X));
+                MousePositionRotation = (float)(Math.Atan2(val.Y, val.X));
 
 
                 if (MousePositionRotation < Rotation) { MousePositionRotation += MathHelper.TwoPi; }
+                
                 if ((MousePositionRotation - Rotation) < MathHelper.Pi)
                 {
-                    Rotation += MathHelper.ToRadians(15) * (float)GameTime.ElapsedGameTime.TotalSeconds;
+                    Rotation += MathHelper.ToRadians(40) * (float)GameTime.ElapsedGameTime.TotalSeconds;
                 }
-                else
+                
+                else if ((MousePositionRotation - Rotation) > MathHelper.Pi)
                 {
-                    Rotation -= MathHelper.ToRadians(15) * (float)GameTime.ElapsedGameTime.TotalSeconds;
+                    Rotation -= MathHelper.ToRadians(40) * (float)GameTime.ElapsedGameTime.TotalSeconds;
                 }
-
+                if (Rotation <= -Math.PI)
+                {
+                    Rotation += (float)MathHelper.TwoPi;
+                }
+                if (Rotation >= Math.PI)
+                {
+                    Rotation -= (float)MathHelper.TwoPi;
+                }
                 timer += (float)GameTime.ElapsedGameTime.TotalSeconds;
                 if (timer > firerate)
                 {
@@ -105,13 +116,12 @@ namespace Timor_Maris
                     this.FiringLocation.X = Position.X - (Texture.Height / 2) * (float)Math.Cos(Rotation);
                     this.FiringLocation.Y = Position.Y - (Texture.Height / 2) * (float)Math.Sin(Rotation);
 
-                    ProjectileList.Add(new Projectile(1, ProjectileSkin, this.FiringLocation, ProjectileDamage, 1000, this.Rotation - MathHelper.ToRadians(180), this.Faction, ImpactSound));
+                    ProjectileList.Add(new Projectile(1, ProjectileSkin, this.FiringLocation, ProjectileDamage, 1000, this.Rotation - MathHelper.ToRadians(180), this.Faction, 100,ImpactSound));
                         
                     ShotsFiredCounter++;
                     FireSound.Play();
 
                     timer = 0;
-                        
                 }
 
                 //STRETCH TO DO: Rebindable Controlls
@@ -128,6 +138,7 @@ namespace Timor_Maris
 
                 Projectile.CheckCollision(otherObject);
 
+                Projectile.setHealth(Projectile.getHealth() - 1);
                 Projectile.Update(GameTime);
                 
             }
@@ -151,6 +162,10 @@ namespace Timor_Maris
         public int getShotsFired()
         {
             return ShotsFiredCounter;
+        }
+        public float getMousePositionRotation()
+        {
+            return MousePositionRotation;
         }
     }
 }

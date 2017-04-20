@@ -8,12 +8,14 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Timor_Maris
 {
-    class Particle
+    public class Particle
     {
         ParticleGenerator Source;
-
-        private Random rngDirection = new Random();
+        
         private Random rngSize = new Random();
+        private Random rngDir = new Random();
+        private Random rngSpd = new Random();
+        private Random rngLyf = new Random();
         private Vector2 Position;
         private Texture2D Texture = null;
         private float Direction = 0;
@@ -46,15 +48,29 @@ namespace Timor_Maris
             this.Texture = Texture;
             this.Source = Source;
 
-            if (Source.RandomDirection)
-            {
-                this.Direction = rngDirection.Next(1, 360);
-            }
+           
             if (Source.RandomSize)
             {
                 int randoScale = rngSize.Next((int)Source.getSizeMulti().X, (int)Source.getSizeMulti().Y);
                 this.Size.X += this.Size.X * randoScale;
                 this.Size.Y += this.Size.Y * randoScale;
+            }
+            if (Source.RandomDirection)
+            { 
+                this.Direction = MathHelper.ToRadians(rngDir.Next((int)MathHelper.ToDegrees(Source.dirMin), (int)MathHelper.ToDegrees(Source.dirMax)));
+            }
+            if (Source.RandomSize == true)
+            {
+                float multiplier = rngSize.Next(Source.sizeMin, Source.sizeMax);
+                this.Size = this.Size * multiplier;
+            }
+            if (Source.RandomSpeed == true)
+            {
+                this.Speed = rngSpd.Next(Source.speedMin, Source.speedMax);
+            }
+            if (Source.RandomLifespan == true)
+            {
+                this.Lifespan = rngLyf.Next(Source.lyfMin, Source.lyfMax);
             }
 
         }
@@ -62,13 +78,9 @@ namespace Timor_Maris
         public void Update(GameTime GameTime)
         {
             
-            
-            
-
             Position.X += Speed * (float)Math.Cos(Direction) * (float)GameTime.ElapsedGameTime.TotalSeconds;
             Position.Y += Speed * (float)Math.Sin(Direction) * (float)GameTime.ElapsedGameTime.TotalSeconds;
             Lifespan--;
-            
 
         }
         public void Render(SpriteBatch spriteBatch, Color Colour)

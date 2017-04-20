@@ -41,7 +41,7 @@ namespace Timor_Maris
         }
         public Matrix get_transformation(GraphicsDevice GraphicsDevice)
         {
-            //Gets the viewport of the current graphics device
+            //Gets the viewport
             Viewport viewport = GraphicsDevice.Viewport;
             //Inverts the current location vector
             transform = Matrix.CreateTranslation(new Vector3(-location.X, -location.Y, 0))
@@ -49,7 +49,7 @@ namespace Timor_Maris
                 * Matrix.CreateRotationZ(rotation)
             //Adds in the scale
                 * Matrix.CreateScale(new Vector3(zoom, zoom, 1))
-            //Adds in the viewport
+            //Adds in the viewport translation
                 * Matrix.CreateTranslation(new Vector3(viewport.Width * 0.5f, viewport.Height * 0.5f, 0));
             return transform;
         }

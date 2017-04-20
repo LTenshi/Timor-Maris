@@ -45,7 +45,7 @@
     <Compile Include="Camera.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleGenerator.cs" />
-    <Compile Include="GameTImor.cs" />
+    <Compile Include="GameTimor.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Projectile.cs" />

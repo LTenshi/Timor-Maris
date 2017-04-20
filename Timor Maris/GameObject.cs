@@ -10,23 +10,24 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Timor_Maris
 {
-    class GameObject
+    public class GameObject
     {
         //Flags
         protected int ID = 0;
         protected int Faction = 0;
         protected bool Alive = true;
         protected bool Collidable = true;
-        protected bool DebugSelected = false;             //This will be used for adding hardpoints. BUT: XML File and how to handle them. (NOTE FROM FUTURE: Might not be feasible time wise)
+        protected bool DebugSelected = false;
 
         protected Vector2 Position = new Vector2(0, 0);
-        protected Vector2 Bounds;
+       
 
         protected float Health = 0f;
         protected float Acceleration = 0f;
         protected float RotationAcceleration = 0f;
         protected float Rotation = 0f;
 
+        #region Animation Variables (currently unusued)
         //Animation Vars
         protected int fMax = 0;
         protected int fCur = 0;
@@ -35,6 +36,7 @@ namespace Timor_Maris
         protected int fWdth = 0;
         protected int fHght = 0;
         protected int fColumns = 0;
+        #endregion
 
         protected Texture2D Texture = null;
 
@@ -49,7 +51,7 @@ namespace Timor_Maris
             this.Texture = Texture;
             this.Position = Position;
             this.Acceleration = Acceleration;
-      
+            
         }
 
         public GameObject(int ID, Texture2D Texture, Vector2 Position, int Faction, float Health)
@@ -59,6 +61,7 @@ namespace Timor_Maris
             this.Position = Position;
             this.Faction = Faction;
             this.Health = Health;
+            
         }
 
         virtual public void Update(GameTime GameTime)
@@ -79,8 +82,6 @@ namespace Timor_Maris
             {
                 spriteBatch.Draw(texture: this.Texture, position: this.Position, origin: this.GetCentre(this.Texture), rotation: this.Rotation - ANGLE_OFFSET, color: Colour);
             }
-            
-            
         }
 
         /// <summary>
@@ -92,6 +93,8 @@ namespace Timor_Maris
         {
             if (OtherGameObject.getAlive() == true)
             {
+                
+
                 if (Position.X + Texture.Width < OtherGameObject.Position.X)
                     return false;
                 if (OtherGameObject.Position.X + OtherGameObject.Texture.Width < Position.X)
@@ -101,6 +104,7 @@ namespace Timor_Maris
                 if (OtherGameObject.Position.Y + OtherGameObject.Texture.Height < Position.Y)
                     return false;
                 return true;
+
             }
             return false;
 
@@ -110,18 +114,13 @@ namespace Timor_Maris
         {
 
         }
-        /// <summary>
-        /// Gets the centre of the texture.
-        /// </summary>
-        /// <param name="Texture"></param>
-        /// <returns></returns>
+#region Get/Set
         public Vector2 GetCentre(Texture2D Texture)
         {
             Vector2 Centre = new Vector2((Texture.Bounds.Width / 2), (Texture.Bounds.Height / 2));
 
             return Centre;
         }
-
         virtual public void Collided(int Type) { }
 
         public bool isCollidable()
@@ -136,10 +135,6 @@ namespace Timor_Maris
         public Vector2 getPosition()
         {
             return Position;
-        }
-        public Vector2 getBounds()
-        {
-            return Bounds;
         }
         public int getID()
         {
@@ -190,4 +185,5 @@ namespace Timor_Maris
             this.Health = Health;
         }
     }
+#endregion
 }

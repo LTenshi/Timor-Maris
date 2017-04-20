@@ -9,13 +9,13 @@ using Microsoft.Xna.Framework.Input;
 
 namespace Timor_Maris
 {
-    class Ship : GameObject
+    public class Ship : GameObject
     {
 
 
         private bool ControlledByPlayer = false;
         private bool ControlledByAI = false;
-        private bool isFlooding = false;
+        
 
         protected float maxVelocity = 0f;
         protected float rotationSpeed = 0f;
@@ -24,7 +24,7 @@ namespace Timor_Maris
         protected int floodingRate = 0;
         protected float waterHP = 0f;
 
-        private List<Vector2> Hardpoint = new List<Vector2>();
+        
         
         public Ship() { }
 
@@ -73,10 +73,7 @@ namespace Timor_Maris
             }
         }
 
-        public void addHardpoint(Vector2 position)
-        {
-            Hardpoint.Add(position);
-        }
+        
 
         public bool isPlayer()
         {
