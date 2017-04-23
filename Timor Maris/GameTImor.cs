@@ -13,7 +13,7 @@ namespace Timor_Maris
     {
 #region DECLARATIONS
         //GAMESTATE OF THE GAME, USED TO DETERMINE WHICH "SCREEN" TO DRAW
-        enum GameState{menu, options, gameOptions, game};
+        enum GameState{menu, options, gameOptions, game, gameOver};
         GameState cSTATE = GameState.menu;
 
         //FONTS, DEVICES, BATCHES AND CAMERA DECLARATION
@@ -69,6 +69,7 @@ namespace Timor_Maris
             graphics.PreferredBackBufferHeight = this.GraphicsDevice.DisplayMode.Height;
             
             graphics.ApplyChanges();
+            Camera.zoom = 1f;
         }
 
         
@@ -145,6 +146,9 @@ namespace Timor_Maris
                 case GameState.game:
                     UpdateGame(gameTime);
                     break;
+                case GameState.gameOver:
+                    UpdateGameOver(gameTime);
+                    break;
             }
         }
         protected void UpdateMainMenu(GameTime gameTime)
@@ -187,6 +191,10 @@ namespace Timor_Maris
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (PlayerShip.getAlive() == false)
+            {
+                cSTATE = GameState.gameOver;
+            }
             //CHECK IF MEDIA PLAYER IS PLAYING IF NOT THEN EXECUTE:
             if (MediaPlayer.State == MediaState.Stopped)
             {
@@ -196,8 +204,8 @@ namespace Timor_Maris
                 MediaPlayer.Play(BackgroundBattle);
             }
 
-            PlayerTurrets[0].setPosition(new Vector2(PlayerShip.getPosition().X - 40 * (float)Math.Cos(PlayerShip.getRotation()), PlayerShip.getPosition().Y - 20 * (float)Math.Sin(PlayerShip.getRotation())));
-            PlayerTurrets[1].setPosition(new Vector2(PlayerShip.getPosition().X + 40 * (float)Math.Cos(PlayerShip.getRotation()), PlayerShip.getPosition().Y + 20 * (float)Math.Sin(PlayerShip.getRotation())));
+            PlayerTurrets[0].setPosition(new Vector2(PlayerShip.getPosition().X -20  * (float)Math.Cos(PlayerShip.getRotation()), PlayerShip.getPosition().Y - 20 * (float)Math.Sin(PlayerShip.getRotation())));
+            PlayerTurrets[1].setPosition(new Vector2(PlayerShip.getPosition().X +20  * (float)Math.Cos(PlayerShip.getRotation()), PlayerShip.getPosition().Y + 20 * (float)Math.Sin(PlayerShip.getRotation())));
             //HANDLES INPUT
             PlayerShip.Handle(gameTime);
             //UPDATES THE SHIP
@@ -240,6 +248,11 @@ namespace Timor_Maris
 
         }
 
+        protected void UpdateGameOver(GameTime gameTime)
+        {
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
+                Exit();
+        }
 
         protected override void Draw(GameTime gameTime)
         {
@@ -260,6 +273,9 @@ namespace Timor_Maris
                 case GameState.game:
                     DrawGame(gameTime);
                     break;
+                case GameState.gameOver:
+                    DrawGameOver(gameTime);
+                    break;
             }
             
 
@@ -274,9 +290,9 @@ namespace Timor_Maris
             spriteBatch.Begin();
             //USING VIEWPORT ALLOWS FOR ADAPTABILITY TO DIFFERENT SCREEN RESOLUTIONS!
             spriteBatch.DrawString(FontGothic20, "TIMOR MARIS", new Vector2(GraphicsDevice.Viewport.Width/ 10, GraphicsDevice.Viewport.Height / 10), Color.White);
-            spriteBatch.DrawString(FontGothic20, "Press ENTER to PLAY", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 6), Color.White);
-            spriteBatch.DrawString(FontGothic20, "Press O for OPTIONS", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 5), Color.White);
-            spriteBatch.DrawString(FontGothic20, "Press ESC to QUIT", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 4), Color.White);
+            spriteBatch.DrawString(FontGothic20, "Press ENTER to PLAY", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 2.5f), Color.White);
+            spriteBatch.DrawString(FontGothic20, "Press O for OPTIONS", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 2), Color.White);
+            spriteBatch.DrawString(FontGothic20, "Press ESC to QUIT", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 1.5f), Color.White);
             spriteBatch.End();
         }
         protected void DrawOptionsMenu(GameTime gameTime)
@@ -284,9 +300,9 @@ namespace Timor_Maris
             GraphicsDevice.Clear(Color.Black);
             spriteBatch.Begin();
             spriteBatch.DrawString(FontGothic20, "OPTIONS MENU", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 10), Color.White);
-            spriteBatch.DrawString(FontGothic20, "Music Volume  (Q = - | E = +): " + MediaPlayer.Volume, new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 5), Color.White);
-            spriteBatch.DrawString(FontGothic20, "SFX Volume    (A = - | D = +): " + SoundEffect.MasterVolume, new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 4), Color.White);
-            spriteBatch.DrawString(FontGothic20, "Press M to mute all sound", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 3), Color.White);
+            spriteBatch.DrawString(FontGothic20, "Music Volume  (Q = - | E = +): " + MediaPlayer.Volume, new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 4), Color.White);
+            spriteBatch.DrawString(FontGothic20, "SFX Volume    (A = - | D = +): " + SoundEffect.MasterVolume, new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 3), Color.White);
+            spriteBatch.DrawString(FontGothic20, "Press M to mute all sound", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 2), Color.White);
             spriteBatch.DrawString(FontGothic20, "Press B to go back to MAIN MENU", new Vector2(GraphicsDevice.Viewport.Width / 10, GraphicsDevice.Viewport.Height / 1.5f), Color.White);
             spriteBatch.End();
         }
@@ -318,6 +334,13 @@ namespace Timor_Maris
             spriteBatch.DrawString(FontGothic20, "Rotation Speed: " + PlayerShip.getRotaSpeed(), new Vector2(0, this.GraphicsDevice.Viewport.Height - 140), Color.Black);
             spriteBatch.End();
 
+        }
+        protected void DrawGameOver(GameTime gameTime)
+        {
+            GraphicsDevice.Clear(Color.Black);
+            spriteBatch.Begin();
+            spriteBatch.DrawString(FontGothic20, "GAME OVER" , new Vector2(0, this.GraphicsDevice.Viewport.Height/2), Color.White);
+            spriteBatch.End();
         }
     }
 }

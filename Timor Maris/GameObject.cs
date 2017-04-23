@@ -91,7 +91,7 @@ namespace Timor_Maris
         /// <returns></returns>
         public bool CheckBasicCollision(GameObject OtherGameObject)
         {
-            if (OtherGameObject.getAlive() == true)
+            if (OtherGameObject.getAlive() == true && this.getAlive() == true)
             {
                 
 
